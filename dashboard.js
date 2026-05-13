@@ -196,28 +196,29 @@ function renderAvatars(users, djSub) {
         const avatar = document.createElement("a-entity");
 
         avatar.innerHTML = `
-            <a-sphere
-                position="${seat.x} ${seat.y + 1.2} ${seat.z}"
-                radius="0.25"
-                color="${isDJ ? '#f59e0b' : '#facc15'}">
-            </a-sphere>
+    <a-sphere
+        position="${seat.x} ${seat.y + 1.35} ${seat.z}"
+        radius="0.4"
+        color="${isDJ ? '#f59e0b' : '#facc15'}">
+    </a-sphere>
 
-            <a-cylinder
-                position="${seat.x} ${seat.y + 0.5} ${seat.z}"
-                radius="0.15"
-                height="0.8"
-                color="${isDJ ? '#dc2626' : '#2563eb'}">
-            </a-cylinder>
+    <a-cylinder
+        position="${seat.x} ${seat.y + 0.55} ${seat.z}"
+        radius="0.18"
+        height="0.9"
+        color="${isDJ ? '#dc2626' : '#2563eb'}">
+    </a-cylinder>
 
-            <a-text
-                value="${user.name}"
-                position="${seat.x - 1} ${seat.y + 1.9} ${seat.z}"
-                color="#FFFFFF"
-                width="4"
-                align="center">
-            </a-text>
-        `;
-
+    <a-text
+        value="${user.name}"
+        position="${seat.x} ${seat.y + 2.15} ${seat.z}"
+        color="#FFFFFF"
+        width="6"
+        align="center"
+        anchor="center"
+        side="double">
+    </a-text>
+`;
         avatarsContainer.appendChild(avatar);
     });
 }
