@@ -36,7 +36,9 @@ const djPanel = document.getElementById("djPanel");
 const playlistContainer = document.getElementById("playlistContainer");
 const avatarsContainer = document.getElementById("avatarsContainer");
 const goLiveBtn = document.getElementById("goLiveBtn");
+
 const stageVideo = document.getElementById("stageVideo");
+const theaterScreen = document.getElementById("theaterScreen");
 
 /* SEATS */
 const seatPositions = [
@@ -45,6 +47,7 @@ const seatPositions = [
     { x: 0, y: 1.1, z: 2 },
     { x: 2, y: 1.1, z: 2 },
     { x: 4, y: 1.1, z: 2 },
+
     { x: -4, y: 1.1, z: 4 },
     { x: -2, y: 1.1, z: 4 },
     { x: 0, y: 1.1, z: 4 },
@@ -138,6 +141,8 @@ async function startDJCamera() {
         stageVideo.srcObject = localStream;
         await stageVideo.play();
 
+        theaterScreen.setAttribute("material", "src", "#stageVideo");
+
         liveRef.set({
             active: true,
             peerId: peer.id,
@@ -162,6 +167,7 @@ function renderDJPanel() {
 
         btn.addEventListener("click", () => {
             if (currentDJ !== userSub) return;
+            if (localStream) return;
 
             playerRef.set({
                 currentVideo: song.videoId,
@@ -352,8 +358,11 @@ liveRef.on("value", (snapshot) => {
             stageVideo.srcObject = remoteStream;
             await stageVideo.play();
 
+            theaterScreen.setAttribute("material", "src", "#stageVideo");
+
         } catch (err) {
             console.error(err);
+            hasConnectedToLive = false;
         }
     });
 
