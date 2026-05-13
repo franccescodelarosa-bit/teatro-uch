@@ -347,7 +347,7 @@ liveRef.on("value", (snapshot) => {
 
     hasConnectedToLive = true;
 
-    const call = peer.call(liveData.peerId, new MediaStream());
+    const call = peer.call(liveData.peerId);
 
     call.on("stream", async (remoteStream) => {
         try {
