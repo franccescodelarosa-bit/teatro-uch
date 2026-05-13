@@ -1,1 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pokémon Trainer Auth</title>
+    <link rel="stylesheet" href="css.css">
+</head>
+<body>
 
+    <div class="container" id="container">
+
+        <!-- REGISTRO -->
+        <div class="form-container sign-up">
+            <form id="registerForm">
+                <h1>Crear entrenador</h1>
+                <p>Registra tu cuenta para entrar a la liga Pokémon</p>
+
+                <input 
+                    type="text" 
+                    id="registerName"
+                    placeholder="Nombre de entrenador" 
+                    required
+                >
+
+                <input 
+                    type="email" 
+                    id="registerEmail"
+                    placeholder="Correo electrónico" 
+                    required
+                >
+
+                <input 
+                    type="password" 
+                    id="registerPassword"
+                    placeholder="Contraseña" 
+                    required
+                >
+
+                <button type="submit" class="primary">
+                    Registrarme
+                </button>
+            </form>
+        </div>
+
+        <!-- LOGIN -->
+        <div class="form-container sign-in">
+            <form id="loginForm">
+                <h1>Bienvenido entrenador</h1>
+                <p>Accede a tu Pokédex Cloud</p>
+
+                <input 
+                    type="email" 
+                    id="loginEmail"
+                    placeholder="Correo electrónico" 
+                    required
+                >
+
+                <input 
+                    type="password" 
+                    id="loginPassword"
+                    placeholder="Contraseña" 
+                    required
+                >
+
+                <button type="submit" class="primary">
+                    Iniciar sesión
+                </button>
+            </form>
+        </div>
+
+        <!-- PANEL ANIMADO -->
+        <div class="overlay-container">
+            <div class="overlay">
+
+                <div class="overlay-panel overlay-left">
+                    <span class="badge">AWS Cognito Ready ⚡</span>
+                    <h1>¿Ya tienes cuenta?</h1>
+                    <p>Tu equipo te está esperando.</p>
+                    <button class="ghost" id="loginBtn">
+                        Iniciar sesión
+                    </button>
+                </div>
+
+                <div class="overlay-panel overlay-right">
+                    <span class="badge">Pokémon Academy 🎓</span>
+                    <h1>¿Nuevo entrenador?</h1>
+                    <p>Crea tu cuenta y comienza la aventura.</p>
+                    <button class="ghost" id="registerBtn">
+                        Registrarse
+                    </button>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script src="myapp.js"></script>
+</body>
+</html>
