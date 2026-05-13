@@ -20,7 +20,9 @@ const firebaseConfig = {
     measurementId: "G-397EX4988L"
 };
 
-firebase.initializeApp(firebaseConfig);
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
 
 const db = firebase.database();
 
@@ -31,6 +33,22 @@ const playerRef = db.ref("poke-teatro/player");
 const usersList = document.getElementById("usersList");
 const djPanel = document.getElementById("djPanel");
 const playlistContainer = document.getElementById("playlistContainer");
+const avatarsContainer = document.getElementById("avatarsContainer");
+
+/* SEATS */
+const seatPositions = [
+    { x: -4, y: 1.1, z: 2 },
+    { x: -2, y: 1.1, z: 2 },
+    { x: 0, y: 1.1, z: 2 },
+    { x: 2, y: 1.1, z: 2 },
+    { x: 4, y: 1.1, z: 2 },
+
+    { x: -4, y: 1.1, z: 4 },
+    { x: -2, y: 1.1, z: 4 },
+    { x: 0, y: 1.1, z: 4 },
+    { x: 2, y: 1.1, z: 4 },
+    { x: 4, y: 1.1, z: 4 }
+];
 
 /* PLAYLIST */
 const playlist = [
@@ -161,11 +179,58 @@ function renderUsers(users, djSub) {
     });
 }
 
+/* AFRAME AVATARS */
+function renderAvatars(users, djSub) {
+    avatarsContainer.innerHTML = "";
+
+    if (!users) return;
+
+    const entries = Object.entries(users);
+
+    entries.forEach(([sub, user], index) => {
+        if (index >= seatPositions.length) return;
+
+        const seat = seatPositions[index];
+        const isDJ = djSub === sub;
+
+        const avatar = document.createElement("a-entity");
+
+        avatar.innerHTML = `
+            <a-sphere
+                position="${seat.x} ${seat.y + 1.2} ${seat.z}"
+                radius="0.25"
+                color="${isDJ ? '#f59e0b' : '#facc15'}">
+            </a-sphere>
+
+            <a-cylinder
+                position="${seat.x} ${seat.y + 0.5} ${seat.z}"
+                radius="0.15"
+                height="0.8"
+                color="${isDJ ? '#dc2626' : '#2563eb'}">
+            </a-cylinder>
+
+            <a-text
+                value="${user.name}"
+                position="${seat.x - 1} ${seat.y + 1.9} ${seat.z}"
+                color="#FFFFFF"
+                width="4"
+                align="center">
+            </a-text>
+        `;
+
+        avatarsContainer.appendChild(avatar);
+    });
+}
+
 /* LISTEN USERS */
-usersRef.on("value", (snapshot) => {
+usersRef.on("value", () => {
     usersRef.once("value", (usersSnap) => {
         rolesRef.once("value", (roleSnap) => {
-            renderUsers(usersSnap.val(), roleSnap.val());
+            const users = usersSnap.val();
+            const dj = roleSnap.val();
+
+            renderUsers(users, dj);
+            renderAvatars(users, dj);
         });
     });
 });
@@ -182,7 +247,10 @@ rolesRef.on("value", (snapshot) => {
     }
 
     usersRef.once("value", (usersSnap) => {
-        renderUsers(usersSnap.val(), currentDJ);
+        const users = usersSnap.val();
+
+        renderUsers(users, currentDJ);
+        renderAvatars(users, currentDJ);
     });
 });
 
