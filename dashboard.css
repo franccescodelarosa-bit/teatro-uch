@@ -48,8 +48,7 @@ body {
 }
 
 .users-placeholder {
-    min-height: 520px;
-    max-height: 520px;
+    height: 350px;
     overflow-y: auto;
     border-radius: 18px;
     border: 1px dashed rgba(255,255,255,0.2);
