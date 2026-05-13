@@ -1,3 +1,4 @@
+const { Amplify, Auth } = window.aws_amplify || window.Amplify;
 const container = document.getElementById("container");
 
 const registerBtn = document.getElementById("registerBtn");
@@ -6,9 +7,7 @@ const loginBtn = document.getElementById("loginBtn");
 const registerForm = document.getElementById("registerForm");
 const loginForm = document.getElementById("loginForm");
 
-const { Auth } = aws_amplify;
-
-aws_amplify.Amplify.configure({
+Amplify.configure({
     Auth: {
         region: "us-east-2",
         userPoolId: "us-east-2_eFOttIH6k",
