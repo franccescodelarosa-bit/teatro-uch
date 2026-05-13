@@ -80,12 +80,12 @@ loginForm.addEventListener("submit", (event) => {
             const accessToken = result.getAccessToken().getJwtToken();
 
             const payload = result.getIdToken().decodePayload();
-
+            
             localStorage.setItem("idToken", idToken);
             localStorage.setItem("accessToken", accessToken);
             localStorage.setItem("userSub", payload.sub);
-
-            console.log("SUB:", payload.sub);
+            localStorage.setItem("userEmail", payload.email || "");
+            localStorage.setItem("userName", payload.name || "Entrenador");
 
             window.location.href = "dashboard.html";
         },
