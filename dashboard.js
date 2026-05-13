@@ -127,6 +127,12 @@ async function startDJCamera() {
     if (currentDJ !== userSub) return;
 
     try {
+        youtubeOverlay.style.display = "none";
+
+        if (player) {
+            player.pauseVideo();
+        }
+
         localStream = await navigator.mediaDevices.getUserMedia({
             video: true,
             audio: false
@@ -134,11 +140,8 @@ async function startDJCamera() {
 
         djPanel.classList.add("hidden");
 
-        if (player) {
-            player.pauseVideo();
-        }
-
         stageVideo.srcObject = localStream;
+
         await stageVideo.play();
 
         theaterScreen.setAttribute("material", {
@@ -154,7 +157,8 @@ async function startDJCamera() {
 
     } catch (error) {
         console.error(error);
-        alert("No se pudo activar la cámara.");
+        youtubeOverlay.style.display = "block";
+        alert("No se pudo activar cámara.");
     }
 }
 
@@ -351,22 +355,25 @@ liveRef.on("value", (snapshot) => {
 
     const call = peer.call(liveData.peerId);
 
-    call.on("stream", async (remoteStream) => {
-        try {
-            if (player) {
-                player.pauseVideo();
-            }
+call.on("stream", async (remoteStream) => {
+    try {
+        youtubeOverlay.style.display = "none";
 
-            stageVideo.srcObject = remoteStream;
-            await stageVideo.play();
-
-            theaterScreen.setAttribute("material", "src", "#stageVideo");
-
-        } catch (err) {
-            console.error(err);
-            hasConnectedToLive = false;
+        if (player) {
+            player.pauseVideo();
         }
-    });
+
+        stageVideo.srcObject = remoteStream;
+
+        await stageVideo.play();
+
+        
+
+    } catch (err) {
+        console.error(err);
+        hasConnectedToLive = false;
+    }
+});
 
     call.on("error", (err) => {
         console.error("WebRTC error:", err);
