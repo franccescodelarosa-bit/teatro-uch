@@ -87,7 +87,7 @@ loginForm.addEventListener("submit", (event) => {
 
             console.log("SUB:", payload.sub);
 
-            alert("Login exitoso entrenador ⚡");
+            window.location.href = "dashboard.html";
         },
 
         onFailure: function (err) {
