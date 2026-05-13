@@ -59,18 +59,23 @@
                 </button>
             </div>
 
-            <!-- YOUTUBE PLAYER -->
-            <div id="youtubeOverlay">
+            <!-- YOUTUBE PLAYER INVISIBLE -->
+            <div id="youtubeOverlay" style="display:none;">
                 <div id="youtubePlayer"></div>
             </div>
 
-            <!-- DJ CAMERA -->
-            <div id="djCameraOverlay" class="hidden">
-                <video id="djVideo" autoplay playsinline muted></video>
-            </div>
-
-            <!-- AFRAME -->
+            <!-- AFRAME THEATER -->
             <a-scene embedded>
+
+                <!-- VIDEO ASSET -->
+                <a-assets>
+                    <video
+                        id="stageVideo"
+                        autoplay
+                        playsinline
+                        crossorigin="anonymous">
+                    </video>
+                </a-assets>
 
                 <!-- CAMERA -->
                 <a-entity position="0 2 8">
@@ -91,10 +96,11 @@
 
                 <!-- SCREEN -->
                 <a-plane
+                    id="theaterScreen"
                     position="0 6 -10"
                     width="10"
                     height="5.5"
-                    color="#000">
+                    material="src: #stageVideo">
                 </a-plane>
 
                 <!-- STAGE -->
@@ -123,7 +129,7 @@
                 <a-light type="ambient" intensity="1"></a-light>
                 <a-light type="point" intensity="1.2" position="0 10 5"></a-light>
 
-                <!-- AVATARS -->
+                <!-- DYNAMIC AVATARS -->
                 <a-entity id="avatarsContainer"></a-entity>
 
             </a-scene>
