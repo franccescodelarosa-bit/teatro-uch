@@ -29,11 +29,17 @@ const db = firebase.database();
 const usersRef = db.ref("poke-teatro/onlineUsers");
 const rolesRef = db.ref("poke-teatro/roles/currentDJ");
 const playerRef = db.ref("poke-teatro/player");
+const liveRef = db.ref("poke-teatro/live");
 
 const usersList = document.getElementById("usersList");
 const djPanel = document.getElementById("djPanel");
 const playlistContainer = document.getElementById("playlistContainer");
 const avatarsContainer = document.getElementById("avatarsContainer");
+
+const goLiveBtn = document.getElementById("goLiveBtn");
+const youtubeOverlay = document.getElementById("youtubeOverlay");
+const djCameraOverlay = document.getElementById("djCameraOverlay");
+const djVideo = document.getElementById("djVideo");
 
 /* SEATS */
 const seatPositions = [
@@ -59,11 +65,28 @@ const playlist = [
     { title: "Pokémon Center", videoId: "4xjR8A9d0hU" }
 ];
 
-/* YOUTUBE PLAYER */
+/* STATE */
 let player;
 let currentDJ = null;
 let djCooldown = false;
 
+let peer;
+let localStream = null;
+
+/* PEER */
+peer = new Peer();
+
+peer.on("open", (id) => {
+    console.log("Peer conectado:", id);
+});
+
+peer.on("call", (call) => {
+    if (!localStream) return;
+
+    call.answer(localStream);
+});
+
+/* YOUTUBE */
 window.onYouTubeIframeAPIReady = function () {
     player = new YT.Player("youtubePlayer", {
         height: "100%",
@@ -94,6 +117,34 @@ currentUserRef.set({
 
 currentUserRef.onDisconnect().remove();
 
+/* DJ CAMERA */
+async function startDJCamera() {
+    if (currentDJ !== userSub) return;
+
+    try {
+        localStream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: false
+        });
+
+        youtubeOverlay.classList.add("hidden");
+        djCameraOverlay.classList.remove("hidden");
+
+        djVideo.srcObject = localStream;
+
+        liveRef.set({
+            active: true,
+            peerId: peer.id,
+            djName: userName || "DJ",
+            startedAt: Date.now()
+        });
+
+    } catch (error) {
+        console.error(error);
+        alert("No se pudo activar la cámara.");
+    }
+}
+
 /* DJ PANEL */
 function renderDJPanel() {
     playlistContainer.innerHTML = "";
@@ -115,9 +166,11 @@ function renderDJPanel() {
 
         playlistContainer.appendChild(btn);
     });
+
+    goLiveBtn.onclick = startDJCamera;
 }
 
-/* USERS LIST */
+/* USERS */
 function renderUsers(users, djSub) {
     usersList.innerHTML = "";
 
@@ -179,7 +232,7 @@ function renderUsers(users, djSub) {
     });
 }
 
-/* AFRAME AVATARS */
+/* AVATARS */
 function renderAvatars(users, djSub) {
     avatarsContainer.innerHTML = "";
 
@@ -196,34 +249,35 @@ function renderAvatars(users, djSub) {
         const avatar = document.createElement("a-entity");
 
         avatar.innerHTML = `
-    <a-sphere
-        position="${seat.x} ${seat.y + 1.35} ${seat.z}"
-        radius="0.4"
-        color="${isDJ ? '#f59e0b' : '#facc15'}">
-    </a-sphere>
+            <a-sphere
+                position="${seat.x} ${seat.y + 1.35} ${seat.z}"
+                radius="0.4"
+                color="${isDJ ? '#f59e0b' : '#facc15'}">
+            </a-sphere>
 
-    <a-cylinder
-        position="${seat.x} ${seat.y + 0.55} ${seat.z}"
-        radius="0.18"
-        height="0.9"
-        color="${isDJ ? '#dc2626' : '#2563eb'}">
-    </a-cylinder>
+            <a-cylinder
+                position="${seat.x} ${seat.y + 0.55} ${seat.z}"
+                radius="0.18"
+                height="0.9"
+                color="${isDJ ? '#dc2626' : '#2563eb'}">
+            </a-cylinder>
 
-    <a-text
-        value="${user.name}"
-        position="${seat.x} ${seat.y + 2.15} ${seat.z}"
-        color="#FFFFFF"
-        width="6"
-        align="center"
-        anchor="center"
-        side="double">
-    </a-text>
-`;
+            <a-text
+                value="${user.name}"
+                position="${seat.x} ${seat.y + 2.15} ${seat.z}"
+                color="#FFFFFF"
+                width="6"
+                align="center"
+                anchor="center"
+                side="double">
+            </a-text>
+        `;
+
         avatarsContainer.appendChild(avatar);
     });
 }
 
-/* LISTEN USERS */
+/* USERS LISTENER */
 usersRef.on("value", () => {
     usersRef.once("value", (usersSnap) => {
         rolesRef.once("value", (roleSnap) => {
@@ -236,7 +290,7 @@ usersRef.on("value", () => {
     });
 });
 
-/* LISTEN DJ */
+/* DJ LISTENER */
 rolesRef.on("value", (snapshot) => {
     currentDJ = snapshot.val();
 
@@ -255,7 +309,7 @@ rolesRef.on("value", (snapshot) => {
     });
 });
 
-/* LISTEN PLAYER */
+/* PLAYER LISTENER */
 playerRef.on("value", (snapshot) => {
     const data = snapshot.val();
 
@@ -264,4 +318,26 @@ playerRef.on("value", (snapshot) => {
     if (data.currentVideo) {
         player.loadVideoById(data.currentVideo);
     }
+});
+
+/* LIVE STREAM LISTENER */
+liveRef.on("value", (snapshot) => {
+    const liveData = snapshot.val();
+
+    if (!liveData || !liveData.active) {
+        djCameraOverlay.classList.add("hidden");
+        youtubeOverlay.classList.remove("hidden");
+        return;
+    }
+
+    if (currentDJ === userSub) return;
+
+    const call = peer.call(liveData.peerId, null);
+
+    call.on("stream", (remoteStream) => {
+        youtubeOverlay.classList.add("hidden");
+        djCameraOverlay.classList.remove("hidden");
+
+        djVideo.srcObject = remoteStream;
+    });
 });
