@@ -35,11 +35,8 @@ const usersList = document.getElementById("usersList");
 const djPanel = document.getElementById("djPanel");
 const playlistContainer = document.getElementById("playlistContainer");
 const avatarsContainer = document.getElementById("avatarsContainer");
-
 const goLiveBtn = document.getElementById("goLiveBtn");
-const youtubeOverlay = document.getElementById("youtubeOverlay");
-const djCameraOverlay = document.getElementById("djCameraOverlay");
-const djVideo = document.getElementById("djVideo");
+const stageVideo = document.getElementById("stageVideo");
 
 /* SEATS */
 const seatPositions = [
@@ -48,7 +45,6 @@ const seatPositions = [
     { x: 0, y: 1.1, z: 2 },
     { x: 2, y: 1.1, z: 2 },
     { x: 4, y: 1.1, z: 2 },
-
     { x: -4, y: 1.1, z: 4 },
     { x: -2, y: 1.1, z: 4 },
     { x: 0, y: 1.1, z: 4 },
@@ -69,15 +65,21 @@ const playlist = [
 let player;
 let currentDJ = null;
 let djCooldown = false;
-
-let peer;
+let peer = null;
 let localStream = null;
+let hasConnectedToLive = false;
 
 /* PEER */
-peer = new Peer();
+peer = new Peer({
+    config: {
+        iceServers: [
+            { urls: "stun:stun.l.google.com:19302" }
+        ]
+    }
+});
 
 peer.on("open", (id) => {
-    console.log("Peer conectado:", id);
+    console.log("Peer listo:", id);
 });
 
 peer.on("call", (call) => {
@@ -89,12 +91,12 @@ peer.on("call", (call) => {
 /* YOUTUBE */
 window.onYouTubeIframeAPIReady = function () {
     player = new YT.Player("youtubePlayer", {
-        height: "100%",
-        width: "100%",
+        height: "1",
+        width: "1",
         videoId: playlist[0].videoId,
         playerVars: {
             autoplay: 1,
-            controls: 1,
+            controls: 0,
             rel: 0
         },
         events: {
@@ -106,7 +108,7 @@ window.onYouTubeIframeAPIReady = function () {
     });
 };
 
-/* REGISTER ONLINE USER */
+/* REGISTER USER */
 const currentUserRef = usersRef.child(userSub);
 
 currentUserRef.set({
@@ -127,10 +129,14 @@ async function startDJCamera() {
             audio: false
         });
 
-        youtubeOverlay.classList.add("hidden");
-        djCameraOverlay.classList.remove("hidden");
+        djPanel.classList.add("hidden");
 
-        djVideo.srcObject = localStream;
+        if (player) {
+            player.pauseVideo();
+        }
+
+        stageVideo.srcObject = localStream;
+        await stageVideo.play();
 
         liveRef.set({
             active: true,
@@ -313,31 +319,46 @@ rolesRef.on("value", (snapshot) => {
 playerRef.on("value", (snapshot) => {
     const data = snapshot.val();
 
-    if (!data || !player) return;
+    if (!data || !player || localStream) return;
 
     if (data.currentVideo) {
         player.loadVideoById(data.currentVideo);
     }
 });
 
-/* LIVE STREAM LISTENER */
+/* LIVE STREAM */
 liveRef.on("value", (snapshot) => {
     const liveData = snapshot.val();
 
     if (!liveData || !liveData.active) {
-        djCameraOverlay.classList.add("hidden");
-        youtubeOverlay.classList.remove("hidden");
+        hasConnectedToLive = false;
         return;
     }
 
     if (currentDJ === userSub) return;
+    if (hasConnectedToLive) return;
+    if (!peer || !peer.id) return;
 
-    const call = peer.call(liveData.peerId, null);
+    hasConnectedToLive = true;
 
-    call.on("stream", (remoteStream) => {
-        youtubeOverlay.classList.add("hidden");
-        djCameraOverlay.classList.remove("hidden");
+    const call = peer.call(liveData.peerId, new MediaStream());
 
-        djVideo.srcObject = remoteStream;
+    call.on("stream", async (remoteStream) => {
+        try {
+            if (player) {
+                player.pauseVideo();
+            }
+
+            stageVideo.srcObject = remoteStream;
+            await stageVideo.play();
+
+        } catch (err) {
+            console.error(err);
+        }
+    });
+
+    call.on("error", (err) => {
+        console.error("WebRTC error:", err);
+        hasConnectedToLive = false;
     });
 });
