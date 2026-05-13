@@ -16,6 +16,9 @@
 
     <!-- YOUTUBE API -->
     <script src="https://www.youtube.com/iframe_api"></script>
+
+    <!-- PEERJS -->
+    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 </head>
 <body>
 
@@ -48,7 +51,12 @@
             <!-- DJ PANEL -->
             <div id="djPanel" class="dj-panel hidden">
                 <h3>🎵 PANEL DEL POKE DJ</h3>
+
                 <div id="playlistContainer"></div>
+
+                <button id="goLiveBtn" class="song-btn">
+                    📹 QUIERO QUE ME VEAN
+                </button>
             </div>
 
             <!-- YOUTUBE PLAYER -->
@@ -56,7 +64,12 @@
                 <div id="youtubePlayer"></div>
             </div>
 
-            <!-- AFRAME THEATER -->
+            <!-- DJ CAMERA -->
+            <div id="djCameraOverlay" class="hidden">
+                <video id="djVideo" autoplay playsinline muted></video>
+            </div>
+
+            <!-- AFRAME -->
             <a-scene embedded>
 
                 <!-- CAMERA -->
@@ -110,7 +123,7 @@
                 <a-light type="ambient" intensity="1"></a-light>
                 <a-light type="point" intensity="1.2" position="0 10 5"></a-light>
 
-                <!-- DYNAMIC AVATARS -->
+                <!-- AVATARS -->
                 <a-entity id="avatarsContainer"></a-entity>
 
             </a-scene>
