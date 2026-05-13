@@ -69,12 +69,14 @@
             <a-scene embedded>
 
                 <!-- VIDEO ASSET PARA STREAM -->
-                <a-assets>
+                  <a-assets>
                     <video
                         id="stageVideo"
                         autoplay
-                        playsinline
+                        loop
                         muted
+                        playsinline
+                        webkit-playsinline
                         crossorigin="anonymous">
                     </video>
                 </a-assets>
@@ -97,13 +99,13 @@
                 </a-plane>
 
                 <!-- SCREEN -->
-                <a-plane
-                    id="theaterScreen"
-                    position="0 6 -10"
-                    width="10"
-                    height="5.5"
-                    color="#000">
-                </a-plane>
+  <a-video
+    id="theaterScreen"
+    src="#stageVideo"
+    position="0 6 -10"
+    width="10"
+    height="5.5">
+</a-video>
 
                 <!-- STAGE -->
                 <a-box
