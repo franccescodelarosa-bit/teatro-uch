@@ -141,7 +141,9 @@ async function startDJCamera() {
         stageVideo.srcObject = localStream;
         await stageVideo.play();
 
-        theaterScreen.setAttribute("material", "src", "#stageVideo");
+        theaterScreen.setAttribute("material", {
+            src: "#stageVideo"
+        });
 
         liveRef.set({
             active: true,
