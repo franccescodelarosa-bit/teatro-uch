@@ -4,7 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>POKE-TEATRO Dashboard</title>
+
     <link rel="stylesheet" href="dashboard.css">
+
+    <!-- FIREBASE -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+    <!-- AFRAME -->
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+
+    <!-- YOUTUBE API -->
+    <script src="https://www.youtube.com/iframe_api"></script>
 </head>
 <body>
 
@@ -16,7 +27,8 @@
                 <h1>POKE-TEATRO</h1>
 
                 <div class="users-box">
-                    <h3>Usuarios conectados</h3>
+                    <h3>Entrenadores conectados</h3>
+
                     <div class="users-placeholder" id="usersList">
                         Esperando entrenadores...
                     </div>
@@ -26,18 +38,86 @@
             <footer class="sidebar-footer">
                 Universidad de Ciencias y Humanidades 2026
                 <br>
-                By Frank De La Rosa and ChatGPT 4.0
+                By Frank De La Rosa + ChatGPT 😎
             </footer>
         </aside>
 
         <!-- MAIN -->
         <main class="main-panel">
-            <!-- magia negra aquí luego -->
+
+            <!-- DJ PANEL -->
+            <div id="djPanel" class="dj-panel hidden">
+                <h3>🎵 PANEL DEL POKE DJ</h3>
+
+                <div id="playlistContainer"></div>
+            </div>
+
+            <!-- YOUTUBE PLAYER -->
+            <div id="youtubeOverlay">
+                <div id="youtubePlayer"></div>
+            </div>
+
+            <!-- AFRAME THEATER -->
+            <a-scene embedded>
+
+                <!-- CAMERA -->
+                <a-entity position="0 2 8">
+                    <a-camera></a-camera>
+                </a-entity>
+
+                <!-- SKY -->
+                <a-sky color="#111827"></a-sky>
+
+                <!-- FLOOR -->
+                <a-plane
+                    position="0 0 0"
+                    rotation="-90 0 0"
+                    width="30"
+                    height="30"
+                    color="#1f2937">
+                </a-plane>
+
+                <!-- SCREEN -->
+                <a-plane
+                    position="0 6 -10"
+                    width="10"
+                    height="5.5"
+                    color="#000">
+                </a-plane>
+
+                <!-- STAGE -->
+                <a-box
+                    position="0 0.5 -7"
+                    width="12"
+                    height="1"
+                    depth="4"
+                    color="#374151">
+                </a-box>
+
+                <!-- SEATS -->
+                <a-box position="-4 0.5 2" width="1" height="1" depth="1" color="#dc2626"></a-box>
+                <a-box position="-2 0.5 2" width="1" height="1" depth="1" color="#dc2626"></a-box>
+                <a-box position="0 0.5 2" width="1" height="1" depth="1" color="#dc2626"></a-box>
+                <a-box position="2 0.5 2" width="1" height="1" depth="1" color="#dc2626"></a-box>
+                <a-box position="4 0.5 2" width="1" height="1" depth="1" color="#dc2626"></a-box>
+
+                <a-box position="-4 0.5 4" width="1" height="1" depth="1" color="#991b1b"></a-box>
+                <a-box position="-2 0.5 4" width="1" height="1" depth="1" color="#991b1b"></a-box>
+                <a-box position="0 0.5 4" width="1" height="1" depth="1" color="#991b1b"></a-box>
+                <a-box position="2 0.5 4" width="1" height="1" depth="1" color="#991b1b"></a-box>
+                <a-box position="4 0.5 4" width="1" height="1" depth="1" color="#991b1b"></a-box>
+
+                <!-- LIGHT -->
+                <a-light type="ambient" intensity="1"></a-light>
+                <a-light type="point" intensity="1.2" position="0 10 5"></a-light>
+
+            </a-scene>
+
         </main>
 
     </div>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-<script src="dashboard.js"></script>
+
+    <script src="dashboard.js"></script>
+
 </body>
 </html>
